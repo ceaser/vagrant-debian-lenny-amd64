@@ -3,24 +3,32 @@ date > /etc/vagrant_box_build_time
 #Updating the box
 apt-get -y update
 apt-get -y install linux-headers-$(uname -r) build-essential
-apt-get -y install zlib1g-dev libssl-dev libreadline5-dev
+apt-get -y install zlib1g-dev libssl-dev libreadline5-dev libyaml libyaml-dev git-core
 apt-get clean
 
 #Setting up sudo
 cp /etc/sudoers /etc/sudoers.orig
 sed -i -e 's/vagrant ALL=(ALL) ALL/vagrant ALL=NOPASSWD:ALL/g' /etc/sudoers
 
-#Installing ruby
-apt-get -y install ruby ruby1.8-dev libopenssl-ruby1.8 rdoc ri irb make g++ libshadow-ruby1.8
+# Installing ruby
+wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.gz
+tar zxf ruby-1.9.3-p194.tar.gz
+pushd ruby-1.9.3-p194
+./configure --prefix /opt/ruby-1.9.3-p194
+make
+make install
+popd
+rm -rf ruby-1.9.3-p194*
 
-# Install RubyGems 1.7.2
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
-tar xzf rubygems-1.7.2.tgz
-cd rubygems-1.7.2
-/usr/bin/ruby setup.rb
-cd ..
-rm -rf rubygems-1.7.2*
-ln -sfv /usr/bin/gem1.8 /usr/bin/gem
+# Install RubyGems 1.8.24
+wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
+tar xzf rubygems-1.8.24.tgz
+pushd rubygems-1.8.24
+/opt/ruby-1.9.3-p194/bin/ruby setup.rb
+popd
+rm -rf rubygems-1.8.24*
+
+echo 'export PATH=/opt/ruby-1.9.3-p194/bin:$PATH' >> /etc/profile
 
 # Installing chef & Puppet
 /usr/bin/gem install chef --no-ri --no-rdoc
