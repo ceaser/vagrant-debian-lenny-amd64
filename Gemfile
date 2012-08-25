@@ -1,5 +1,5 @@
 source :rubygems
 
 gem 'vagrant'
-gem 'veewee'
+gem 'veewee', '0.3.0.beta1'
 
