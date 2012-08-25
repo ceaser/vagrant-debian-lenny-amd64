@@ -3,28 +3,70 @@ date > /etc/vagrant_box_build_time
 #Updating the box
 apt-get -y update
 apt-get -y install linux-headers-$(uname -r) build-essential
-apt-get -y install zlib1g-dev libssl-dev libreadline5-dev
+apt-get -y install zlib1g-dev libssl-dev libreadline5-dev libyaml-0-1 libyaml-dev git-core
 apt-get clean
 
 #Setting up sudo
 cp /etc/sudoers /etc/sudoers.orig
 sed -i -e 's/vagrant ALL=(ALL) ALL/vagrant ALL=NOPASSWD:ALL/g' /etc/sudoers
 
-#Installing ruby
-apt-get -y install ruby ruby1.8-dev libopenssl-ruby1.8 rdoc ri irb make g++ libshadow-ruby1.8
+# Installing rbenv to manage ruby
+RBENV_ROOT="$HOME/.rbenv"
 
-# Install RubyGems 1.7.2
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
-tar xzf rubygems-1.7.2.tgz
-cd rubygems-1.7.2
-/usr/bin/ruby setup.rb
-cd ..
-rm -rf rubygems-1.7.2*
-ln -sfv /usr/bin/gem1.8 /usr/bin/gem
+git clone git://github.com/sstephenson/rbenv.git $RBENV_ROOT
 
-# Installing chef & Puppet
-/usr/bin/gem install chef --no-ri --no-rdoc
-/usr/bin/gem install puppet --no-ri --no-rdoc
+# Installing rbenv plugins
+PLUGINS=(
+  "sstephenson:rbenv-vars"
+  "sstephenson:ruby-build"
+)
+for plugin in ${PLUGINS[@]} ; do
+
+  KEY=${plugin%%:*}
+  VALUE=${plugin#*:}
+
+  RBENV_PLUGIN_ROOT="${RBENV_ROOT}/plugins/$VALUE"
+  git clone git://github.com/$KEY/$VALUE.git $RBENV_PLUGIN_ROOT
+done
+
+# .profile
+cat <<'EOP' >> /$HOME/.profile
+if [ -d $HOME/.rbenv ]; then
+  export PATH="$HOME/.rbenv/bin:$PATH"
+  eval "$(rbenv init -)"
+fi
+EOP
+
+# .gemrc
+cat << EOF > .gemrc
+---
+:sources:
+- http://gems.rubyforge.org
+install: --no-rdoc --no-ri
+update: --no-ri --no-rdoc
+EOF
+
+# Installing ruby-1.9.3-p194
+source ~/.profile
+rbenv install 1.9.3-p194
+rbenv global 1.9.3-p194
+rbenv rehash
+gem update --system
+rbenv rehash
+gem install chef --no-ri --no-rdoc
+gem install puppet  --no-ri --no-rdoc
+rbenv rehash
+
+# Installing ruby-1.9.3-p194
+source ~/.profile
+rbenv install 1.9.3-p194
+rbenv global 1.9.3-p194
+rbenv rehash
+gem update --system
+rbenv rehash
+gem install chef --no-ri --no-rdoc
+gem install puppet  --no-ri --no-rdoc
+rbenv rehash
 
 #Installing vagrant keys
 mkdir /home/vagrant/.ssh
