@@ -3,7 +3,7 @@ Veewee::Session.declare({
   :memory_size=> '256',
   :disk_size => '10140', :disk_format => 'VDI', :hostiocache => 'off',
   :os_type_id => 'Debian_64',
-  :iso_file => "debian-508-amd64-netinst.iso",
+  :iso_file => "debian-5010-amd64-netinst.iso",
   :iso_src => "http://cdimage.debian.org/cdimage/archive/5.0.10/amd64/iso-cd/debian-5010-amd64-netinst.iso",
   :iso_md5 => "0e5f0126e271ead360cd10dc0833569a",
   :iso_download_timeout => "1000",
