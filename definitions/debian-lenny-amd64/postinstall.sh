@@ -13,13 +13,13 @@ sed -i -e 's/vagrant ALL=(ALL) ALL/vagrant ALL=NOPASSWD:ALL/g' /etc/sudoers
 #Installing ruby
 apt-get -y install ruby ruby1.8-dev libopenssl-ruby1.8 rdoc ri irb make g++ libshadow-ruby1.8
 
-# Install RubyGems 1.7.2
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
-tar xzf rubygems-1.7.2.tgz
-cd rubygems-1.7.2
-/usr/bin/ruby setup.rb
-cd ..
-rm -rf rubygems-1.7.2*
+# Install RubyGems 1.8.24
+wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
+tar xzf rubygems-1.8.24.tgz
+pushd rubygems-1.8.24
+/usr/bin/ruby/bin/ruby setup.rb
+popd
+rm -rf rubygems-1.8.24*
 ln -sfv /usr/bin/gem1.8 /usr/bin/gem
 
 # Installing chef & Puppet
